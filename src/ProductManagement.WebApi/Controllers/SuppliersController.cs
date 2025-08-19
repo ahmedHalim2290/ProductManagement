@@ -29,7 +29,7 @@ public class SuppliersController : ControllerBase {
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] SupplierDto supplierDto)
+    public async Task<IActionResult> Create([FromBody] SupplierRequestDto supplierDto)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -38,13 +38,13 @@ public class SuppliersController : ControllerBase {
         return CreatedAtAction(nameof(GetById), new { id = createdSupplier.Id }, createdSupplier);
     }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, [FromBody] SupplierDto supplierDto)
+    [HttpPut]
+    public async Task<IActionResult> Update([FromBody] SupplierRequestDto supplierDto)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        await _supplierService.UpdateSupplierAsync(id, supplierDto);
+        await _supplierService.UpdateSupplierAsync(supplierDto);
         return NoContent();
     }
 

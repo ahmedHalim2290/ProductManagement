@@ -7,6 +7,7 @@ namespace ProductManagement.Application.Profiles;
 public class ProductProfile : Profile {
     public ProductProfile()
     {
-        CreateMap<Product, ProductDto>().ReverseMap();
+        CreateMap<Product, ProductRequestDto>().ReverseMap();
+        CreateMap<Product, ProductResponseDto>().ReverseMap();
     }
 }

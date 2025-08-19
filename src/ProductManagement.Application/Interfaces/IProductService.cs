@@ -1,16 +1,23 @@
 ﻿using ProductManagement.Application.DTOs;
+using ProductManagement.Core.Enums;
 
 namespace ProductManagement.Application.Interfaces;
 
 public interface IProductService {
-    Task<IEnumerable<ProductDto>> GetAllProductsAsync();
-    Task<ProductDto> GetProductByIdAsync(int id);
-    Task<ProductDto> CreateProductAsync(ProductDto productDto);
-    Task UpdateProductAsync(int id, ProductDto productDto);
+    Task<IEnumerable<ProductResponseDto>> GetAllProductsAsync();
+    Task<ProductResponseDto> GetProductByIdAsync(int id);
+    Task<ProductResponseDto> CreateProductAsync(ProductRequestDto productDto);
+    Task<ProductResponseDto> UpdateProductAsync(ProductRequestDto productDto);
     Task DeleteProductAsync(int id);
-    Task<IEnumerable<ProductDto>> SearchProductsAsync(string searchTerm);
+    Task<IEnumerable<ProductResponseDto>> SearchProductsAsync(string? name,
+    QuantityPerUnit? quantityPerUnit,
+    int? reorderLevel,
+    string? supplierName,
+    double? unitPrice,
+    int? unitsInStock,
+    int? unitsOnOrder);
     // Statistics methods
-    Task<IEnumerable<ProductDto>> GetProductsNeedReorderAsync();
-    Task<SupplierDto> GetLargestSupplierAsync();
-    Task<ProductDto> GetProductWithMinOrdersAsync();
+    Task<IEnumerable<ProductResponseDto>> GetProductsNeedReorderAsync();
+    Task<SupplierResponseDto> GetLargestSupplierAsync();
+    Task<ProductResponseDto> GetProductWithMinOrdersAsync();
 }

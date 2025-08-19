@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProductManagement.Application.DTOs;
 using ProductManagement.Application.Interfaces;
+using ProductManagement.Core.Enums;
 using ProductManagement.Core.Exceptions;
 
 namespace ProductManagement.WebApi.Controllers;
@@ -32,7 +33,7 @@ public class ProductsController : ControllerBase {
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] ProductDto productDto)
+    public async Task<IActionResult> Create([FromBody] ProductRequestDto productDto)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -41,18 +42,18 @@ public class ProductsController : ControllerBase {
         return CreatedAtAction(nameof(GetById), new { id = createdProduct.Id }, createdProduct);
     }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, [FromBody] ProductDto productDto)
+    [HttpPut]
+    public async Task<IActionResult> Update([FromBody] ProductRequestDto productDto)
     {
         try
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (id != productDto.Id)
+            if (productDto.Id != productDto.Id)
                 return BadRequest("ID mismatch between URL and request body");
 
-            await _productService.UpdateProductAsync(id, productDto);
+            await _productService.UpdateProductAsync( productDto);
             return NoContent();
         }
         catch (NotFoundException ex)
@@ -88,14 +89,29 @@ public class ProductsController : ControllerBase {
     }
 
     [HttpGet("search")]
-    public async Task<IActionResult> Search([FromQuery] string term)
+    public async Task<IActionResult> Search(string? name,
+    QuantityPerUnit? quantityPerUnit,
+    int? reorderLevel,
+    string? supplierName,
+    double? unitPrice,
+    int? unitsInStock,
+    int? unitsOnOrder)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(term))
-                return BadRequest("Search term cannot be empty");
+            // Check if ALL parameters are null/empty
+            if (string.IsNullOrWhiteSpace(name) &&
+                !quantityPerUnit.HasValue &&
+                !reorderLevel.HasValue &&
+                string.IsNullOrWhiteSpace(supplierName) &&
+                !unitPrice.HasValue &&
+                !unitsInStock.HasValue &&
+                !unitsOnOrder.HasValue)
+            {
+                return BadRequest("At least one search parameter must be provided");
+            }
 
-            var results = await _productService.SearchProductsAsync(term);
+            var results = await _productService.SearchProductsAsync(name,quantityPerUnit,reorderLevel,supplierName,unitPrice,unitsInStock,unitsOnOrder);
             return Ok(results);
         }
         catch (Exception ex)

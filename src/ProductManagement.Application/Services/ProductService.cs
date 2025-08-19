@@ -2,8 +2,11 @@
 using ProductManagement.Application.DTOs;
 using ProductManagement.Application.Interfaces;
 using ProductManagement.Core.Entities;
+using ProductManagement.Core.Enums;
 using ProductManagement.Core.Exceptions;
 using ProductManagement.Core.Interfaces;
+using System.ComponentModel.DataAnnotations;
+using System.Linq.Expressions;
 
 namespace ProductManagement.Application.Services;
 
@@ -17,23 +20,23 @@ public class ProductService : IProductService {
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<ProductDto>> GetAllProductsAsync()
+    public async Task<IEnumerable<ProductResponseDto>> GetAllProductsAsync()
     {
         var products = await _unitOfWork.ProductRepository.GetAllAsync(
             includes: p => p.Supplier);
-        return _mapper.Map<IEnumerable<ProductDto>>(products);
+        return _mapper.Map<IEnumerable<ProductResponseDto>>(products);
     }
 
-    public async Task<ProductDto> GetProductByIdAsync(int id)
+    public async Task<ProductResponseDto> GetProductByIdAsync(int id)
     {
         var product = await _unitOfWork.ProductRepository.GetAllAsync(
             p => p.Id == id,
             includes: p => p.Supplier);
 
-        return _mapper.Map<ProductDto>(product.FirstOrDefault());
+        return _mapper.Map<ProductResponseDto>(product.FirstOrDefault());
     }
 
-    public async Task<ProductDto> CreateProductAsync(ProductDto productDto)
+    public async Task<ProductResponseDto> CreateProductAsync(ProductRequestDto productDto)
     {
         // Check if supplier exists first
         var supplierExists = await _unitOfWork.SupplierRepository.ExistsAsync(x => x.Id == productDto.SupplierId);
@@ -47,10 +50,10 @@ public class ProductService : IProductService {
         await _unitOfWork.ProductRepository.AddAsync(product);
         await _unitOfWork.CompleteAsync();
 
-        return _mapper.Map<ProductDto>(product);
+        return _mapper.Map<ProductResponseDto>(product);
     }
 
-    public async Task UpdateProductAsync(int id, ProductDto productDto)
+    public async Task<ProductResponseDto> UpdateProductAsync(ProductRequestDto productDto)
     {
         // Check if supplier exists first
         var supplierExists = await _unitOfWork.SupplierRepository.ExistsAsync(x => x.Id == productDto.SupplierId);
@@ -60,13 +63,14 @@ public class ProductService : IProductService {
         }
 
 
-        var product = await _unitOfWork.ProductRepository.GetByIdAsync(id);
+        var product = await _unitOfWork.ProductRepository.GetByIdAsync(productDto.Id);
         if (product == null)
-            throw new NotFoundException(nameof(Product), id);
+            throw new NotFoundException(nameof(Product), productDto.Id);
 
         _mapper.Map(productDto, product);
         await _unitOfWork.ProductRepository.UpdateAsync(product);
         await _unitOfWork.CompleteAsync();
+        return _mapper.Map<ProductResponseDto>(product);
     }
 
     public async Task DeleteProductAsync(int id)
@@ -79,22 +83,58 @@ public class ProductService : IProductService {
         await _unitOfWork.CompleteAsync();
     }
 
-    public Task<IEnumerable<ProductDto>> SearchProductsAsync(string searchTerm)
+    public async Task<IEnumerable<ProductResponseDto>> SearchProductsAsync(string? name,
+    QuantityPerUnit? quantityPerUnit,
+    int? reorderLevel,
+    string? supplierName,
+    double? unitPrice,
+    int? unitsInStock,
+    int? unitsOnOrder)
+    {
+        // Build the predicate dynamically
+        Expression<Func<Product, bool>> predicate = p =>
+            (string.IsNullOrEmpty(name) || p.Name.Contains(name)) &&
+            (!quantityPerUnit.HasValue || p.QuantityPerUnit == quantityPerUnit.Value) &&
+            (!reorderLevel.HasValue || p.ReorderLevel == reorderLevel.Value) &&
+            (string.IsNullOrEmpty(supplierName) || p.Supplier.Name.Contains(supplierName)) &&
+            (!unitPrice.HasValue || p.UnitPrice == unitPrice.Value) &&
+            (!unitsInStock.HasValue || p.UnitsInStock == unitsInStock.Value) &&
+            (!unitsOnOrder.HasValue || p.UnitsOnOrder == unitsOnOrder.Value);
+
+        // Fetch data with includes and filtering
+        var products = await _unitOfWork.ProductRepository.GetAllAsync(
+            predicate,
+            p => p.Supplier  // Include Supplier
+        );
+
+        // Map to DTO
+        return products.Select(p => new  ProductResponseDto
+        {
+            Id = p.Id,
+            Name = p.Name,
+            QuantityPerUnit = p.QuantityPerUnit,
+            ReorderLevel = p.ReorderLevel,
+            SupplierId = p.SupplierId,
+            SupplierName = p.Supplier.Name,
+            UnitPrice = p.UnitPrice,
+            UnitsInStock = p.UnitsInStock,
+            UnitsOnOrder = p.UnitsOnOrder
+        });
+    
+
+    }
+
+    public Task<IEnumerable<ProductResponseDto>> GetProductsNeedReorderAsync()
     {
         throw new NotImplementedException();
     }
 
-    public Task<IEnumerable<ProductDto>> GetProductsNeedReorderAsync()
+    public Task<SupplierResponseDto> GetLargestSupplierAsync()
     {
         throw new NotImplementedException();
     }
 
-    public Task<SupplierDto> GetLargestSupplierAsync()
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<ProductDto> GetProductWithMinOrdersAsync()
+    public Task<ProductResponseDto> GetProductWithMinOrdersAsync()
     {
         throw new NotImplementedException();
     }

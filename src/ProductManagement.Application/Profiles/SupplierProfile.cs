@@ -7,7 +7,8 @@ namespace ProductManagement.Application.Profiles;
 public class SupplierProfile : Profile {
     public SupplierProfile()
     {
-        CreateMap<Supplier, SupplierDto>().ReverseMap();
+        CreateMap<Supplier, SupplierRequestDto>().ReverseMap();
+        CreateMap<Supplier, SupplierResponseDto>().ReverseMap();
     }
 
 }

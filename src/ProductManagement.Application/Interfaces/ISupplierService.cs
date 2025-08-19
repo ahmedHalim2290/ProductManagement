@@ -2,10 +2,10 @@
 
 namespace ProductManagement.Application.Interfaces;
 public interface ISupplierService {
-    Task<IEnumerable<SupplierDto>> GetAllSuppliersAsync();
-    Task<SupplierDto> GetSupplierByIdAsync(int id);
-    Task<SupplierDto> CreateSupplierAsync(SupplierDto supplierDto);
-    Task UpdateSupplierAsync(int id, SupplierDto supplierDto);
+    Task<IEnumerable<SupplierRequestDto>> GetAllSuppliersAsync();
+    Task<SupplierRequestDto> GetSupplierByIdAsync(int id);
+    Task<SupplierRequestDto> CreateSupplierAsync(SupplierRequestDto supplierDto);
+    Task UpdateSupplierAsync(SupplierRequestDto supplierDto);
     Task DeleteSupplierAsync(int id);
     Task<int> GetProductCountBySupplierAsync(int supplierId);
 }

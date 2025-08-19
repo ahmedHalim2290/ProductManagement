@@ -16,24 +16,24 @@ public class SupplierService : ISupplierService {
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<SupplierDto>> GetAllSuppliersAsync()
+    public async Task<IEnumerable<SupplierRequestDto>> GetAllSuppliersAsync()
     {
         var suppliers = await _unitOfWork.SupplierRepository.GetAllAsync(
             includes: s => s.Products);
 
-        var supplierDtos = _mapper.Map<IEnumerable<SupplierDto>>(suppliers);
+        var supplierDtos = _mapper.Map<IEnumerable<SupplierRequestDto>>(suppliers);
 
         // Map product count
-        foreach (var supplierDto in supplierDtos)
-        {
-            supplierDto.ProductCount = suppliers
-                .First(s => s.Id == supplierDto.Id).Products.Count;
-        }
+        //foreach (var supplierDto in supplierDtos)
+        //{
+        //    supplierDto.ProductCount = suppliers
+        //        .First(s => s.Id == supplierDto.Id).Products.Count;
+        //}
 
         return supplierDtos;
     }
 
-    public async Task<SupplierDto> GetSupplierByIdAsync(int id)
+    public async Task<SupplierRequestDto> GetSupplierByIdAsync(int id)
     {
         var supplier = (await _unitOfWork.SupplierRepository.GetAllAsync(
             s => s.Id == id,
@@ -42,27 +42,27 @@ public class SupplierService : ISupplierService {
         if (supplier == null)
             throw new NotFoundException(nameof(Supplier), id);
 
-        var supplierDto = _mapper.Map<SupplierDto>(supplier);
-        supplierDto.ProductCount = supplier.Products.Count;
+        var supplierDto = _mapper.Map<SupplierRequestDto>(supplier);
+      //  supplierDto.ProductCount = supplier.Products.Count;
 
         return supplierDto;
     }
 
-    public async Task<SupplierDto> CreateSupplierAsync(SupplierDto supplierDto)
+    public async Task<SupplierRequestDto> CreateSupplierAsync(SupplierRequestDto supplierDto)
     {
         var supplier = _mapper.Map<Supplier>(supplierDto);
 
         await _unitOfWork.SupplierRepository.AddAsync(supplier);
         await _unitOfWork.CompleteAsync();
 
-        return _mapper.Map<SupplierDto>(supplier);
+        return _mapper.Map<SupplierRequestDto>(supplier);
     }
 
-    public async Task UpdateSupplierAsync(int id, SupplierDto supplierDto)
+    public async Task UpdateSupplierAsync(SupplierRequestDto supplierDto)
     {
-        var supplier = await _unitOfWork.SupplierRepository.GetByIdAsync(id);
+        var supplier = await _unitOfWork.SupplierRepository.GetByIdAsync(supplierDto.Id);
         if (supplier == null)
-            throw new NotFoundException(nameof(Supplier), id);
+            throw new NotFoundException(nameof(Supplier), supplierDto.Id);
 
         _mapper.Map(supplierDto, supplier);
         await _unitOfWork.SupplierRepository.UpdateAsync(supplier);
