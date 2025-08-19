@@ -5,8 +5,10 @@ using ProductManagement.Core.Entities;
 using ProductManagement.Core.Enums;
 using ProductManagement.Core.Exceptions;
 using ProductManagement.Core.Interfaces;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
+using System.Xml.Linq;
 
 namespace ProductManagement.Application.Services;
 
@@ -108,35 +110,27 @@ public class ProductService : IProductService {
         );
 
         // Map to DTO
-        return products.Select(p => new  ProductResponseDto
-        {
-            Id = p.Id,
-            Name = p.Name,
-            QuantityPerUnit = p.QuantityPerUnit,
-            ReorderLevel = p.ReorderLevel,
-            SupplierId = p.SupplierId,
-            SupplierName = p.Supplier.Name,
-            UnitPrice = p.UnitPrice,
-            UnitsInStock = p.UnitsInStock,
-            UnitsOnOrder = p.UnitsOnOrder
-        });
-    
+        return _mapper.Map<IEnumerable<ProductResponseDto>>(products);
+
 
     }
 
-    public Task<IEnumerable<ProductResponseDto>> GetProductsNeedReorderAsync()
+    public async Task<IEnumerable<ProductResponseDto>> GetProductsNeedReorderAsync()
     {
-        throw new NotImplementedException();
+        Expression<Func<Product, bool>> predicate = p => p.UnitsInStock <= p.ReorderLevel;
+       var products = await _unitOfWork.ProductRepository.GetAllAsync(predicate);
+        return _mapper.Map<IEnumerable<ProductResponseDto>>(products);
+
     }
 
-    public Task<SupplierResponseDto> GetLargestSupplierAsync()
-    {
-        throw new NotImplementedException();
-    }
+   
 
-    public Task<ProductResponseDto> GetProductWithMinOrdersAsync()
+    public async Task<ProductResponseDto> GetProductWithMinOrdersAsync()
     {
-        throw new NotImplementedException();
+        var product =( await _unitOfWork.ProductRepository.GetAllAsync())
+                       .OrderBy(p => p.UnitsOnOrder)
+                       .FirstOrDefault();
+        return _mapper.Map<ProductResponseDto>(product);
     }
 
 

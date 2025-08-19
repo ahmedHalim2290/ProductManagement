@@ -136,21 +136,7 @@ public class ProductsController : ControllerBase {
         }
     }
 
-    [HttpGet("statistics/largest-supplier")]
-    public async Task<IActionResult> GetLargestSupplier()
-    {
-        try
-        {
-            var supplier = await _productService.GetLargestSupplierAsync();
-            return Ok(supplier);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting largest supplier");
-            return StatusCode(500, "An error occurred while getting largest supplier");
-        }
-    }
-
+  
     [HttpGet("statistics/min-orders-product")]
     public async Task<IActionResult> GetProductWithMinOrders()
     {

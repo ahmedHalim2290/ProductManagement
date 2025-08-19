@@ -7,5 +7,6 @@ public interface ISupplierService {
     Task<SupplierRequestDto> CreateSupplierAsync(SupplierRequestDto supplierDto);
     Task UpdateSupplierAsync(SupplierRequestDto supplierDto);
     Task DeleteSupplierAsync(int id);
+    Task<SupplierResponseDto> GetLargestSupplierAsync();
     Task<int> GetProductCountBySupplierAsync(int supplierId);
 }

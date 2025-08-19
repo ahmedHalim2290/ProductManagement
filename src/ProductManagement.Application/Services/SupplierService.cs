@@ -4,6 +4,7 @@ using ProductManagement.Application.Interfaces;
 using ProductManagement.Core.Entities;
 using ProductManagement.Core.Exceptions;
 using ProductManagement.Core.Interfaces;
+using System.Linq.Expressions;
 
 namespace ProductManagement.Application.Services;
 public class SupplierService : ISupplierService {
@@ -18,8 +19,7 @@ public class SupplierService : ISupplierService {
 
     public async Task<IEnumerable<SupplierRequestDto>> GetAllSuppliersAsync()
     {
-        var suppliers = await _unitOfWork.SupplierRepository.GetAllAsync(
-            includes: s => s.Products);
+        var suppliers = await _unitOfWork.SupplierRepository.GetAllAsync(s => s.Products);
 
         var supplierDtos = _mapper.Map<IEnumerable<SupplierRequestDto>>(suppliers);
 
@@ -37,7 +37,7 @@ public class SupplierService : ISupplierService {
     {
         var supplier = (await _unitOfWork.SupplierRepository.GetAllAsync(
             s => s.Id == id,
-            includes: s => s.Products)).FirstOrDefault();
+            s => s.Products)).FirstOrDefault();
 
         if (supplier == null)
             throw new NotFoundException(nameof(Supplier), id);
@@ -83,7 +83,20 @@ public class SupplierService : ISupplierService {
         await _unitOfWork.SupplierRepository.DeleteAsync(supplier);
         await _unitOfWork.CompleteAsync();
     }
-
+    public async Task<SupplierResponseDto> GetLargestSupplierAsync()
+    {
+        var largestSupplier = (await _unitOfWork.SupplierRepository.GetAllAsync(s => s.Products))
+            .Select(s => new SupplierResponseDto
+            {
+                Id = s.Id,
+                Name = s.Name,
+                ProductCount = s.Products.Count()
+            })
+            .OrderByDescending(x => x.ProductCount)
+            .FirstOrDefault();
+        var supplierDto = _mapper.Map<SupplierResponseDto>(largestSupplier);
+        return supplierDto;
+    }
     public async Task<int> GetProductCountBySupplierAsync(int supplierId)
     {
         var products = await _unitOfWork.ProductRepository.GetAllAsync(p => p.SupplierId == supplierId);

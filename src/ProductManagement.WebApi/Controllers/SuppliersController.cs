@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProductManagement.Application.DTOs;
 using ProductManagement.Application.Interfaces;
+using ProductManagement.Application.Services;
 
 namespace ProductManagement.WebApi.Controllers;
 
@@ -8,10 +9,11 @@ namespace ProductManagement.WebApi.Controllers;
 [Route("api/[controller]")]
 public class SuppliersController : ControllerBase {
     private readonly ISupplierService _supplierService;
-
-    public SuppliersController(ISupplierService supplierService)
+    private readonly ILogger<ProductsController> _logger;
+    public SuppliersController(ISupplierService supplierService, ILogger<ProductsController> logger)
     {
         _supplierService = supplierService;
+        _logger = logger;
     }
 
     [HttpGet]
@@ -61,4 +63,19 @@ public class SuppliersController : ControllerBase {
         var count = await _supplierService.GetProductCountBySupplierAsync(id);
         return Ok(count);
     }
+    [HttpGet("statistics/largest-supplier")]
+    public async Task<IActionResult> GetLargestSupplier()
+    {
+        try
+        {
+            var supplier = await _supplierService.GetLargestSupplierAsync();
+            return Ok(supplier);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting largest supplier");
+            return StatusCode(500, "An error occurred while getting largest supplier");
+        }
+    }
+
 }

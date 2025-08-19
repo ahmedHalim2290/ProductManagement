@@ -18,6 +18,5 @@ public interface IProductService {
     int? unitsOnOrder);
     // Statistics methods
     Task<IEnumerable<ProductResponseDto>> GetProductsNeedReorderAsync();
-    Task<SupplierResponseDto> GetLargestSupplierAsync();
     Task<ProductResponseDto> GetProductWithMinOrdersAsync();
 }
