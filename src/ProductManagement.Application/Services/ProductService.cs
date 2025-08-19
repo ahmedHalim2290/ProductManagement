@@ -99,5 +99,5 @@ public class ProductService : IProductService {
         throw new NotImplementedException();
     }
 
-    // Implement other methods similarly...
+
 }

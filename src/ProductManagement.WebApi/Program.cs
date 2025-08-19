@@ -17,7 +17,18 @@ namespace ProductManagement.WebApi {
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
+            // Add CORS services
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAngularDevClient",
+                    builder =>
+                    {
+                        builder.WithOrigins("http://localhost:4200")
+                               .AllowAnyHeader()
+                               .AllowAnyMethod()
+                               .AllowCredentials();
+                    });
+            });
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -29,8 +40,6 @@ namespace ProductManagement.WebApi {
 
             builder.Services.AddControllers();
             builder.Services.AddAutoMapper(typeof(ProductProfile).Assembly);
-            builder.Services.AddAutoMapper(typeof(SupplierProfile).Assembly);
-            builder.Services.AddAutoMapper(typeof(Program)); // or pass your assembly
 
             builder.Services.AddEndpointsApiExplorer();
             // Configure Swagger
@@ -52,7 +61,7 @@ namespace ProductManagement.WebApi {
                     c.SwaggerEndpoint("/swagger/v1/swagger.json", "ProductManagement API v1");
                 });
             }
-
+            app.UseCors("AllowAngularDevClient");
             //app.UseMiddleware<ExceptionMiddleWare>();
 
             app.UseHttpsRedirection();

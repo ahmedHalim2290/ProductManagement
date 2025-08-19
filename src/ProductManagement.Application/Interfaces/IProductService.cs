@@ -14,5 +14,3 @@ public interface IProductService {
     Task<SupplierDto> GetLargestSupplierAsync();
     Task<ProductDto> GetProductWithMinOrdersAsync();
 }
-
-// Similar for ISupplierService
