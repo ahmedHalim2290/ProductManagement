@@ -117,17 +117,16 @@ public class ProductService : IProductService {
 
     public async Task<IEnumerable<ProductResponseDto>> GetProductsNeedReorderAsync()
     {
-        Expression<Func<Product, bool>> predicate = p => p.UnitsInStock <= p.ReorderLevel;
-       var products = await _unitOfWork.ProductRepository.GetAllAsync(predicate);
+        var products = await _unitOfWork.ProductRepository.GetAllAsync(p => p.UnitsInStock <= p.ReorderLevel, includes: p => p.Supplier);
         return _mapper.Map<IEnumerable<ProductResponseDto>>(products);
 
     }
 
-   
+
 
     public async Task<ProductResponseDto> GetProductWithMinOrdersAsync()
     {
-        var product =( await _unitOfWork.ProductRepository.GetAllAsync())
+        var product = (await _unitOfWork.ProductRepository.GetAllAsync())
                        .OrderBy(p => p.UnitsOnOrder)
                        .FirstOrDefault();
         return _mapper.Map<ProductResponseDto>(product);

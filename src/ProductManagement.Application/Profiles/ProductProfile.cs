@@ -8,6 +8,8 @@ public class ProductProfile : Profile {
     public ProductProfile()
     {
         CreateMap<Product, ProductRequestDto>().ReverseMap();
-        CreateMap<Product, ProductResponseDto>().ReverseMap();
+        CreateMap<Product, ProductResponseDto>()
+    .ForMember(dest => dest.QuantityPerUnitName,
+               opt => opt.MapFrom(src => src.QuantityPerUnit.ToString()));
     }
 }

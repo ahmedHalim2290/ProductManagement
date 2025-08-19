@@ -63,19 +63,6 @@ public class SuppliersController : ControllerBase {
         var count = await _supplierService.GetProductCountBySupplierAsync(id);
         return Ok(count);
     }
-    [HttpGet("statistics/largest-supplier")]
-    public async Task<IActionResult> GetLargestSupplier()
-    {
-        try
-        {
-            var supplier = await _supplierService.GetLargestSupplierAsync();
-            return Ok(supplier);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting largest supplier");
-            return StatusCode(500, "An error occurred while getting largest supplier");
-        }
-    }
-
+ 
+  
 }

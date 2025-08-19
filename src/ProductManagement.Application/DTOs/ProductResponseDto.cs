@@ -6,6 +6,7 @@ public class ProductResponseDto {
     public int Id { get; set; }
     public string Name { get; set; }
     public QuantityPerUnit QuantityPerUnit { get; set; }
+    public string QuantityPerUnitName { get; set; }
     public int ReorderLevel { get; set; }
     public int SupplierId { get; set; }
     public string SupplierName { get; set; }

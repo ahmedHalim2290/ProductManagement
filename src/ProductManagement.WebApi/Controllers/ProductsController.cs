@@ -53,7 +53,7 @@ public class ProductsController : ControllerBase {
             if (productDto.Id != productDto.Id)
                 return BadRequest("ID mismatch between URL and request body");
 
-            await _productService.UpdateProductAsync( productDto);
+            await _productService.UpdateProductAsync(productDto);
             return NoContent();
         }
         catch (NotFoundException ex)
@@ -111,7 +111,7 @@ public class ProductsController : ControllerBase {
                 return BadRequest("At least one search parameter must be provided");
             }
 
-            var results = await _productService.SearchProductsAsync(name,quantityPerUnit,reorderLevel,supplierName,unitPrice,unitsInStock,unitsOnOrder);
+            var results = await _productService.SearchProductsAsync(name, quantityPerUnit, reorderLevel, supplierName, unitPrice, unitsInStock, unitsOnOrder);
             return Ok(results);
         }
         catch (Exception ex)
@@ -121,34 +121,4 @@ public class ProductsController : ControllerBase {
         }
     }
 
-    [HttpGet("statistics/reorder")]
-    public async Task<IActionResult> GetProductsNeedReorder()
-    {
-        try
-        {
-            var products = await _productService.GetProductsNeedReorderAsync();
-            return Ok(products);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting products that need reorder");
-            return StatusCode(500, "An error occurred while getting products that need reorder");
-        }
-    }
-
-  
-    [HttpGet("statistics/min-orders-product")]
-    public async Task<IActionResult> GetProductWithMinOrders()
-    {
-        try
-        {
-            var product = await _productService.GetProductWithMinOrdersAsync();
-            return Ok(product);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error getting product with minimum orders");
-            return StatusCode(500, "An error occurred while getting product with minimum orders");
-        }
-    }
 }
