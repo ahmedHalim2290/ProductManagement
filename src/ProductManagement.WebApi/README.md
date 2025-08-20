@@ -82,15 +82,23 @@ Follow these instructions to get a copy of the project up and running on your lo
 | `PUT` | `/api/Product/{id}` | Update an existing product |
 | `DELETE` | `/api/Product/{id}` | Delete a product |
 
-**Example Product Object:**
-```
-{
-  "id": 0,
-  "name": "string",
-  "quantityPerUnit": 1,
-  "reorderLevel": 2147483647,
-  "supplierId": 0,
-  "unitPrice": 0,
-  "unitsInStock": 2147483647,
-  "unitsOnOrder": 2147483647
-}
+Example Product Object:
+
+    ```
+    {
+      "id": 0,
+      "name": "string",
+      "quantityPerUnit": 1,
+      "reorderLevel": 2147483647,
+      "supplierId": 0,
+      "unitPrice": 0,
+      "unitsInStock": 2147483647,
+      "unitsOnOrder": 2147483647
+    }
+
+
+## 👨‍💻 Author
+
+**Ahmed Halim**
+
+GitHub: [@ahmedHalim2290](https://github.com/ahmedHalim2290)
